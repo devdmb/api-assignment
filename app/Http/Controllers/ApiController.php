@@ -12,6 +12,7 @@ use App\Models\Auth\ModelHasRoles;
 
 class ApiController extends Controller
 {
+    // authenticate user with username and password
     public function authenticate(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -29,6 +30,7 @@ class ApiController extends Controller
         return response()->json(compact('message', 'token'), 200);
     }
 
+    // User registartion with basic information
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -50,6 +52,7 @@ class ApiController extends Controller
             'confirmed' => 1,
         ]);
 
+        // Assign role deafult as 3 user and model type "App\Models\Auth\User"
         if(!empty($user)) {
             $model_role = new ModelHasRoles;
             $model_role->role_id = 3;
@@ -63,6 +66,7 @@ class ApiController extends Controller
         return response()->json(compact('user','token'),201);
     }
 
+    // Fetch login user profile
     public function getAuthenticatedUser()
     {
         try {
@@ -79,6 +83,7 @@ class ApiController extends Controller
         return response()->json(compact('user'));
     }
 
+    // User profile without Auth need to send user id
     public function getUserProfile($id = 0)
     { 
         $get_profile = User::find($id);
@@ -88,6 +93,11 @@ class ApiController extends Controller
         return response()->json(compact('get_profile'));
     }
 
+    /* Update login user profile 
+       Set email parameter user change email
+       Set password and confirm passwoord parameters if user change password
+       Set avatar as profile picture if user upload image currently i have create one function for upload image below of Controller we can set in helper. Upload path is upload/user so we can set this either in storage or any third party like AWS.
+    */
     public function updateAuthenticatedUser(Request $request)
     { 
         $arrInput = $request->all();
@@ -141,9 +151,6 @@ class ApiController extends Controller
     }
 
     function UploadFile($file, $path) {
-        //$arrInput = $request->all();
-        //dd($file);
-        //$file = $request->file('image');
         //Display File Name
         $filename = time().'_'.rand(1, 100).'_'.$file->getClientOriginalName();
         $file->getClientOriginalExtension();
